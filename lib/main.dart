@@ -1,62 +1,52 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'logic/cubit/counter_cubit.dart';
-import 'presentation/screens/home_screen.dart';
-import 'presentation/screens/second_screen.dart';
-import 'presentation/screens/third_screen.dart';
+import 'logic/cubit/internet_cubit.dart';
+import 'presentation/router/app_router.dart';
+//import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  final CounterState counterState1 = CounterState(counterValue: 1);
+/*   final CounterState counterState1 = CounterState(counterValue: 1);
   final CounterState counterState2 = CounterState(counterValue: 1);
-  print(counterState1 == counterState2);
-  runApp(MyApp());
+  print(counterState1 == counterState2); */
+  runApp(MyApp(
+    appRouter: AppRouter(),
+    connectivity: Connectivity(),
+  ));
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
+class MyApp extends StatelessWidget {
+  final AppRouter appRouter /*  = AppRouter() */;
+  final Connectivity connectivity;
 
-class _MyAppState extends State<MyApp> {
-  final CounterCubit _counterCubit = CounterCubit();
+  const MyApp({
+    Key? key,
+    required this.appRouter,
+    required this.connectivity,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      /* home: BlocProvider<CounterCubit>(
-        create: (context) => CounterCubit(),
-        child: HomeScreen(
-          title: 'Flutter Demo Home Page',
-          color: Colors.amber,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<InternetCubit>(
+          create: (context) => InternetCubit(connectivity: connectivity),
         ),
-      ), */
-      routes: {
-        '/': (context) => BlocProvider.value(
-            value: _counterCubit,
-            child: HomeScreen(title: 'HomeScreen', color: Colors.blueAccent)),
-        'second': (context) => BlocProvider.value(
-            value: _counterCubit,
-            child:
-                SecondScreen(title: 'SecondScreen', color: Colors.redAccent)),
-        'third': (context) => BlocProvider.value(
-            value: _counterCubit,
-            child:
-                ThirdScreen(title: 'ThirdScreen', color: Colors.greenAccent)),
-      },
+        BlocProvider<CounterCubit>(
+          create: (context) =>
+              CounterCubit(internetCubit: context.read<InternetCubit>()),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        onGenerateRoute: appRouter.onGenerateRoute,
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _counterCubit.close();
-    super.dispose();
   }
 }

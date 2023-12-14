@@ -93,14 +93,14 @@ class _ThirdScreenState extends State<ThirdScreen> {
                 ),
               ],
             ),
-            SizedBox(
+            /* SizedBox(
               height: 24,
             ),
             MaterialButton(
               onPressed: () {},
               child: Text('Go to second screen'),
               color: widget.color,
-            )
+            ) */
           ],
         ),
       ),

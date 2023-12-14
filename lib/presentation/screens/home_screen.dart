@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutterblocconcepts_3/logic/cubit/counter_cubit.dart';
-import 'package:flutterblocconcepts_3/presentation/screens/second_screen.dart';
+
+import '../../constants/enums.dart';
+import '../../logic/cubit/counter_cubit.dart';
+import '../../logic/cubit/internet_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({required this.title, required this.color});
@@ -24,21 +26,46 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            BlocBuilder<InternetCubit, InternetState>(
+              builder: (context, state) {
+                //print('sate ' + state.connectionType.toString());
+                if (state is InternetConnected &&
+                    state.connectionType == ConnectionType.wifi) {
+                  return const Text(
+                    'Wifi',
+                    style: TextStyle(color: Colors.greenAccent),
+                  );
+                } else if (state is InternetConnected &&
+                    state.connectionType == ConnectionType.mobile) {
+                  return const Text(
+                    'Mobile',
+                    style: TextStyle(color: Colors.redAccent),
+                  );
+                } else if (state is InternetConnected) {
+                  return const Text(
+                    'Disconnected',
+                    style: TextStyle(color: Colors.grey),
+                  );
+                }
+                return const CircularProgressIndicator();
+              },
             ),
+            const Divider(height: 5),
+            /* Text(
+              'You have pushed the button this many times:',
+            ), */
             BlocConsumer<CounterCubit, CounterState>(
               listener: (context, state) {
                 if (state.wasIncremented == true) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Incremented!'),
                       duration: Duration(milliseconds: 300),
                     ),
                   );
                 } else if (state.wasIncremented == false) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Decremented!'),
                       duration: Duration(milliseconds: 300),
                     ),
@@ -68,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
               },
             ),
-            SizedBox(
+            /* SizedBox(
               height: 24,
             ),
             Row(
@@ -93,8 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Icon(Icons.add),
                 ),
               ],
-            ),
-            SizedBox(
+            ), */
+            const SizedBox(
               height: 24,
             ),
             MaterialButton(
@@ -102,9 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).pushNamed('/second');
               },
               color: widget.color,
-              child: Text('Go to second screen'),
+              child: const Text('Go to second screen'),
             ),
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
             MaterialButton(
@@ -112,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).pushNamed('/third');
               },
               color: widget.color,
-              child: Text('Go to third screen'),
+              child: const Text('Go to third screen'),
             )
           ],
         ),
